@@ -1,0 +1,56 @@
+ :root {
+        /* Основной цвет индиго и его оттенки для интерактивности */
+        --uk-primary-color: #4338ca;
+        --uk-primary-hover: #3730a3;
+        --uk-primary-active: #2e2a85;
+    }
+
+    /* Перекрашиваем кнопки класса .uk-button-primary */
+    .uk-button-primary {
+        background-color: var(--uk-primary-color) !important;
+        color: #fff !important;
+    }
+    .uk-button-primary:hover, .uk-button-primary:focus {
+        background-color: var(--uk-primary-hover) !important;
+    }
+    .uk-button-primary:active {
+        background-color: var(--uk-primary-active) !important;
+    }
+
+    /* Перекрашиваем иконки и текст с классом .uk-text-primary */
+    .uk-text-primary {
+        color: var(--uk-primary-color) !important;
+    }
+
+    /* Перекрашиваем карточки тарифов .uk-card-primary */
+    .uk-card-primary {
+        background-color: var(--uk-primary-color) !important;
+    }
+
+    /* Навигация: активные пункты меню и ссылки */
+    .uk-navbar-nav > li.uk-active > a,
+    .uk-navbar-nav > li:hover > a {
+        color: var(--uk-primary-color) !important;
+    }
+
+    /* Обновляем цвет фонового оверлея в секции Hero, чтобы он гармонировал с индиго */
+    .hero-overlay {
+        background: linear-gradient(rgba(30, 27, 75, 0.75), rgba(15, 23, 42, 0.85)) !important;
+    }
+    /* Перекрашиваем верхнюю панель контактов в глубокий индиго */
+.top-contact-bar {
+    background-color: #1e1b4b !important; /* Ультра-глубокий индиго (ночной оттенок) */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Перекрашиваем активный таб переключателя цен в индиго */
+.uk-subnav-pill > .uk-active > a {
+    background-color: var(--uk-primary-color) !important;
+    color: #fff !important;
+}
+
+/* Эффект при наведении на неактивный таб */
+.uk-subnav-pill > * > a:hover {
+    background-color: #f3f4f6 !important; /* Легкий серый фон */
+    color: var(--uk-primary-color) !important;
+}

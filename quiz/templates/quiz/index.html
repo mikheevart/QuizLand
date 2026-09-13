@@ -1,0 +1,87 @@
+{% extends 'quiz/base.html' %}
+
+{% block content %}
+<div class="uk-container uk-margin-medium-top" id="quiz-app-container">
+    <div class="uk-text-center uk-margin-large-bottom" id="welcome-headers">
+        <h1 class="uk-heading-small">Добро пожаловать в КвизЛэнд!</h1>
+        <p class="uk-text-lead">Выберите интересующую вас тему и проверьте свои знания.</p>
+    </div>
+
+    <!-- Сетка викторин -->
+    <div class="uk-grid-match uk-child-width-1-3@m uk-child-width-1-2@s" uk-grid id="quizzes-grid">
+        {% for quiz in quizzes %}
+        <div>
+            <div class="uk-card uk-card-default uk-card-hover uk-flex uk-flex-column uk-border-rounded">
+                <div class="uk-card-body uk-flex-1">
+                    <h3 class="uk-card-title uk-text-bold">{{ quiz.title }}</h3>
+                    <p>{{ quiz.description|default:"Без описания." }}</p>
+                </div>
+                <div class="uk-card-footer uk-background-muted">
+                    <button onclick="startQuizGame({{ quiz.id }})" class="uk-button uk-button-text uk-text-primary">
+                        Начать тест <span uk-icon="arrow-right"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="uk-width-1-1 uk-text-center">
+            <div class="uk-alert-warning" uk-alert>
+                <p>Викторин пока нет.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const appContainer = document.getElementById('quiz-app-container');
+
+// 1. Старт квиза (загрузка лейаута)
+async function startQuizGame(quizId) {
+    let response = await fetch(`/ajax/quiz/${quizId}/start/`);
+    let data = await response.json();
+    
+    if(!data.authenticated) {
+        UIkit.notification({message: data.message, status: 'warning'});
+        loadAuthModal('login'); // Открываем модалку если не авторизован
+        return;
+    }
+    
+    // Скрываем шапку и сетку, вставляем игровой шаблон
+    appContainer.innerHTML = data.html;
+    // Загружаем первый вопрос
+    loadNextQuestion();
+}
+
+// 2. Рендеринг текущего вопроса
+async function loadNextQuestion(formData = null) {
+    let options = { method: 'GET' };
+    if (formData) {
+        options = {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+        };
+    }
+
+    let response = await fetch("{% url 'ajax_next_question' %}", options);
+    let data = await response.json();
+    
+    const dynamicZone = document.getElementById('game-dynamic-zone');
+    if(!dynamicZone) return;
+
+    dynamicZone.innerHTML = data.html;
+    
+    // Если это карточка вопроса, вешаем перехват отправки формы
+    const form = document.getElementById('ajax-quiz-form');
+    if(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loadNextQuestion(new FormData(form));
+        });
+    }
+}
+</script>
+{% endblock %}

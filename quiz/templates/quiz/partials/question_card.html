@@ -1,0 +1,19 @@
+<div class="uk-margin-medium-top">
+    <div class="uk-text-meta uk-margin-small-bottom">Вопрос {{ current_num }} из {{ total_num }}</div>
+    <progress class="uk-progress" value="{{ progress }}" max="100"></progress>
+</div>
+
+<h3 class="uk-text-large uk-margin-medium-top">{{ question.text }}</h3>
+
+<form id="ajax-quiz-form">
+    {% csrf_token %}
+    <div class="uk-margin uk-child-width-1-1 uk-grid-small" uk-grid>
+        {% for answer in question.answers.all %}
+        <label class="uk-padding-small uk-background-muted uk-border-rounded uk-flex uk-flex-middle" style="cursor: pointer;">
+            <input class="uk-radio" type="radio" name="answer_id" value="{{ answer.id }}" required>
+            <span class="uk-margin-small-left">{{ answer.text }}</span>
+        </label>
+        {% endfor %}
+    </div>
+    <button type="submit" class="uk-button uk-button-primary uk-width-1-1 uk-margin-top">Ответить</button>
+</form>

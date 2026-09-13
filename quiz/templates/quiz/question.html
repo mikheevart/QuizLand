@@ -1,0 +1,52 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Вопрос {{ current_num }} - КвизЛэнд{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-container-small uk-margin-medium-top uk-margin-medium-bottom">
+    
+    <!-- Индикатор прогресса -->
+    <div class="uk-flex uk-flex-between uk-flex-bottom uk-margin-small-bottom">
+        <span class="uk-text-meta">Вопрос {{ current_num }} из {{ total_num }}</span>
+        <span class="uk-text-lead uk-text-bold">{{ progress }}%</span>
+    </div>
+    <progress class="uk-progress uk-margin-remove-top" value="{{ progress }}" max="100"></progress>
+
+    <!-- Карточка с вопросом -->
+    <div class="uk-card uk-card-default uk-box-shadow-medium uk-border-rounded">
+        
+        <!-- Шапка карточки -->
+        <div class="uk-card-header uk-background-primary">
+            <h3 class="uk-card-title uk-text-white uk-margin-remove">{{ question.text }}</h3>
+        </div>
+        
+        <!-- Тело карточки с формой -->
+        <div class="uk-card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="uk-margin uk-child-width-1-1 uk-grid-small" uk-grid>
+                    {% for answer in question.answers.all %}
+                    <label class="uk-padding-small uk-border-rounded uk-background-default uk-box-shadow-hover-small" 
+                           style="border: 1px solid #e5e5e5; cursor: pointer; transition: 0.2s;">
+                        
+                        <input class="uk-radio" type="radio" name="answer_id" value="{{ answer.id }}" required>
+                        <span class="uk-margin-small-left uk-text-emphasis">{{ answer.text }}</span>
+                    
+                    </label>
+                    {% endfor %}
+                </div>
+                
+                <!-- Кнопка отправки -->
+                <div class="uk-margin-medium-top">
+                    <button type="submit" class="uk-button uk-button-primary uk-button-large uk-width-1-1 uk-border-rounded">
+                        Ответить <span uk-icon="arrow-right"></span>
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

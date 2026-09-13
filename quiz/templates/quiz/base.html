@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}КвизЛэнд{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'quiz/css/uikit.min.css' %}" />
+</head>
+<body class="uk-background-muted" style="min-height: 100vh;">
+
+    <nav class="uk-navbar-container uk-margin-bottom" uk-navbar>
+        <div class="uk-navbar-left uk-margin-left">
+            <a class="uk-navbar-item uk-logo" href="/">🧠 КвизЛэнд</a>
+        </div>
+        <div class="uk-navbar-right uk-margin-right">
+            <div class="uk-navbar-item" id="nav-auth-section">
+                    {% if user.is_authenticated %}
+                        <span class="uk-margin-right">Привет, <strong>{{ user.username }}</strong>!</span>
+                        
+                        <!-- ИСПРАВЛЕНО: Форма POST для безопасного выхода -->
+                        <form action="/admin/logout/" method="post" class="uk-display-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="uk-button uk-button-default uk-button-small uk-border-rounded">
+                                Выйти
+                            </button>
+                        </form>
+                        
+                    {% else %}
+                        <button class="uk-button uk-button-primary uk-button-small" id="btn-open-login">Войти</button>
+                    {% endif %}
+                </div>
+
+        </div>
+    </nav>
+
+    <main id="main-content-zone">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Единое модальное окно UIkit для Входа/Регистрации -->
+    <div id="auth-modal" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-border-rounded" id="auth-modal-body">
+            <!-- Сюда JS загрузит форму -->
+        </div>
+    </div>
+
+    <script src="{% static 'quiz/js/uikit.min.js' %}"></script>
+    <script src="{% static 'quiz/js/uikit-icons.min.js' %}"></script>
+    
+    <!-- Скрипт глобального JS-менеджера нашего AJAX приложения -->
+    <script>
+    const authModalEl = document.getElementById('auth-modal');
+    
+    // Функция открытия окон авторизации
+    async function loadAuthModal(type = 'login') {
+        const url = type === 'login' ? "{% url 'ajax_login' %}" : "{% url 'ajax_register' %}";
+        let response = await fetch(url);
+        let data = await response.json();
+        document.getElementById('auth-modal-body').innerHTML = data.html;
+        UIkit.modal(authModalEl).show();
+        bindAuthSubmit();
+    }
+
+    // Слушатель отправки форм авторизации
+    function bindAuthSubmit() {
+        const form = document.getElementById('auth-form-submit');
+        if(!form) return;
+        
+        // Переключатели внутри модалки
+        const toReg = document.getElementById('switch-to-register');
+        const toLog = document.getElementById('switch-to-login');
+        if(toReg) toReg.addEventListener('click', (e) => { e.preventDefault(); loadAuthModal('register'); });
+        if(toLog) toLog.addEventListener('click', (e) => { e.preventDefault(); loadAuthModal('login'); });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let formData = new FormData(form);
+            let response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+            });
+            let data = await response.json();
+            if(data.success) {
+                UIkit.modal(authModalEl).hide();
+                UIkit.notification({message: data.message, status: 'success'});
+                setTimeout(() => location.reload(), 1000); // Перезагружаем для обновления сессии сессии
+            } else {
+                document.getElementById('auth-errors').innerText = "Ошибка заполнения формы. Проверьте данные.";
+            }
+        });
+    }
+
+    if(document.getElementById('btn-open-login')) {
+        document.getElementById('btn-open-login').addEventListener('click', () => loadAuthModal('login'));
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Результаты - КвизЛэнд{% endblock %}
+
+{% block content %}
+<div class="uk-container uk-container-small uk-margin-large-top uk-text-center">
+    <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large uk-border-rounded uk-animation-scale-up">
+        
+        <div class="uk-margin">
+            <span class="uk-text-success" uk-icon="icon: check; ratio: 4"></span>
+        </div>
+        
+        <h1 class="uk-heading-medium uk-margin-remove-top">Викторина завершена!</h1>
+        
+        <p class="uk-text-large">
+            Ваш результат: <strong class="uk-text-primary">{{ score }}</strong> из <strong>{{ total }}</strong> правильных ответов.
+        </p>
+
+        <div class="uk-margin-medium-top">
+            <a href="/" class="uk-button uk-button-secondary uk-button-large uk-border-rounded">
+                <span uk-icon="refresh"></span> Пройти еще раз
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

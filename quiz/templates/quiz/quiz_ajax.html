@@ -1,0 +1,45 @@
+<div class="uk-container uk-container-small uk-margin-medium-top">
+    <!-- Сюда JS будет вставлять вопросы и прогресс-бар -->
+    <div id="quiz-container">
+        <div class="uk-text-center"><div uk-spinner></div></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('quiz-container');
+
+    // Функция загрузки контента
+    async function loadQuestion(formData = null) {
+        let options = { method: 'GET' };
+        if (formData) {
+            options = {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+            };
+        }
+
+        let response = await fetch("{% url 'get_next_question' %}", options);
+        let data = await response.json();
+        
+        // Плавное обновление контента с помощью UIkit анимации
+        container.style.opacity = 0;
+        setTimeout(() => {
+            container.innerHTML = data.html;
+            container.style.opacity = 1;
+        }, 200);
+    }
+
+    // Первичная загрузка первого вопроса
+    loadQuestion();
+
+    # Используем делегирование событий для перехвата отправки динамической формы
+    container.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        loadQuestion(formData);
+    });
+});
+</script>

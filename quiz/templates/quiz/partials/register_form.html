@@ -1,0 +1,13 @@
+<form id="auth-form-submit" method="post" action="{% url 'ajax_register' %}">
+    {% csrf_token %}
+    <h2 class="uk-modal-title">Регистрация аккаунта</h2>
+    <div class="uk-margin" style="max-height: 300px; overflow-y: auto;">
+        {{ form.as_p }}
+    </div>
+    <div id="auth-errors" class="uk-text-danger uk-margin-small"></div>
+    <p class="uk-text-right">
+        <button class="uk-button uk-button-default uk-modal-close" type="button">Отмена</button>
+        <button class="uk-button uk-button-primary" type="submit">Создать аккаунт</button>
+    </p>
+    <p class="uk-text-meta">Уже есть аккаунт? <a href="#" id="switch-to-login">Войти</a></p>
+</form>
